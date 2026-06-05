@@ -8,23 +8,11 @@ import {
   remove,
   get,
   set,
-  onDisconnect,
 } from "firebase/database";
 
 import { db } from "../lib/firebase";
 
 import { v4 as uuid } from "uuid";
-
-const CLIENT_ID_KEY = "mapuyap-client-id";
-
-const getClientId = () => {
-  let clientId = localStorage.getItem(CLIENT_ID_KEY);
-  if (!clientId) {
-    clientId = uuid();
-    localStorage.setItem(CLIENT_ID_KEY, clientId);
-  }
-  return clientId;
-};
 
 export default function ChatPage() {
   const [status, setStatus] = useState("Searching...");
@@ -34,19 +22,13 @@ export default function ChatPage() {
   }, []);
 
   const findMatch = async () => {
-    const name = localStorage.getItem("name") || "Anonymous";
-    const department = localStorage.getItem("department") || "Unknown";
-    const clientId = getClientId();
+    const name =
+      localStorage.getItem("name") ||
+      "Anonymous";
 
-    const presenceRef = ref(db, `presence/${clientId}`);
-    await set(presenceRef, {
-      name,
-      department,
-      status: "searching",
-      roomId: null,
-      updatedAt: Date.now(),
-    });
-    await onDisconnect(presenceRef).remove();
+    const department =
+      localStorage.getItem("department") ||
+      "Unknown";
 
     const queueRef = ref(db, "queue");
 
@@ -60,11 +42,7 @@ export default function ChatPage() {
       await set(myRef, {
         name,
         department,
-        clientId,
-        status: "searching",
-        createdAt: Date.now(),
       });
-      await onDisconnect(ref(db, `queue/${myRef.key}`)).remove();
 
       waitForMatch(myRef.key!);
 
@@ -79,11 +57,7 @@ export default function ChatPage() {
       await set(myRef, {
         name,
         department,
-        clientId,
-        status: "searching",
-        createdAt: Date.now(),
       });
-      await onDisconnect(ref(db, `queue/${myRef.key}`)).remove();
 
       waitForMatch(myRef.key!);
 
@@ -94,25 +68,26 @@ export default function ChatPage() {
 
     const roomId = uuid();
 
-    await set(ref(db, `rooms/${roomId}`), {
-      createdAt: Date.now(),
-    });
+    await set(
+      ref(db, `rooms/${roomId}`),
+      {
+        createdAt: Date.now(),
+      }
+    );
 
-    await set(ref(db, `matches/${otherId}`), {
-      roomId,
-    });
+    await set(
+      ref(db, `matches/${otherId}`),
+      {
+        roomId,
+      }
+    );
 
-    await remove(ref(db, `queue/${otherId}`));
+    await remove(
+      ref(db, `queue/${otherId}`)
+    );
 
-    await set(presenceRef, {
-      name,
-      department,
-      status: "matched",
-      roomId,
-      updatedAt: Date.now(),
-    });
-
-    window.location.href = `/chat/${roomId}`;
+    window.location.href =
+      `/chat/${roomId}`;
   };
 
   const waitForMatch = (myId: string) => {
