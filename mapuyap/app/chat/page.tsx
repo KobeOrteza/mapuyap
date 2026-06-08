@@ -1,170 +1,108 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import {
-  ref,
-  push,
-  remove,
-  get,
-  set,
-} from "firebase/database";
-
-import { db } from "../lib/firebase";
-
-import { v4 as uuid } from "uuid";
+import { useRouter } from "next/navigation";
 
 export default function ChatPage() {
-  const [status, setStatus] = useState("Searching...");
+  const router = useRouter();
+  const [handle, setHandle] = useState("Cardinal");
+  const [department, setDepartment] = useState("");
 
   useEffect(() => {
-    findMatch();
+    // Grab cached user node details from local storage criteria
+    const savedName = localStorage.getItem("name");
+    const savedDept = localStorage.getItem("department");
+    
+    if (savedName) setHandle(savedName);
+    if (savedDept) setDepartment(savedDept);
   }, []);
 
-  const findMatch = async () => {
-    const name =
-      localStorage.getItem("name") ||
-      "Anonymous";
-
-    const department =
-      localStorage.getItem("department") ||
-      "Unknown";
-
-    const queueRef = ref(db, "queue");
-
-    const snapshot = await get(queueRef);
-
-    const queue = snapshot.val();
-
-    if (!queue) {
-      const myRef = push(queueRef);
-
-      await set(myRef, {
-        name,
-        department,
-      });
-
-      waitForMatch(myRef.key!);
-
-      return;
-    }
-
-    const users = Object.entries(queue);
-
-    if (users.length === 0) {
-      const myRef = push(queueRef);
-
-      await set(myRef, {
-        name,
-        department,
-      });
-
-      waitForMatch(myRef.key!);
-
-      return;
-    }
-
-    const [otherId] = users[0];
-
-    const roomId = uuid();
-
-    await set(
-      ref(db, `rooms/${roomId}`),
-      {
-        createdAt: Date.now(),
-      }
-    );
-
-    await set(
-      ref(db, `matches/${otherId}`),
-      {
-        roomId,
-      }
-    );
-
-    await remove(
-      ref(db, `queue/${otherId}`)
-    );
-
-    window.location.href =
-      `/chat/${roomId}`;
-  };
-
-  const waitForMatch = (myId: string) => {
-    const matchRef =
-      ref(db, `matches/${myId}`);
-
-    const interval = setInterval(
-      async () => {
-        const snap = await get(matchRef);
-
-        if (snap.exists()) {
-          clearInterval(interval);
-
-          const roomId =
-            snap.val().roomId;
-
-          await remove(matchRef);
-
-          window.location.href =
-            `/chat/${roomId}`;
-        }
-      },
-      1000
-    );
+  const handleCancel = () => {
+    router.push("/");
   };
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
-      {/* 3D Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-20 w-96 h-96 rounded-full border-2 border-red-600/30 float-3d" style={{ animationDelay: "0s" }}></div>
-        <div className="absolute top-40 right-10 w-[500px] h-[500px] rounded-full border-2 border-yellow-500/20 float-3d" style={{ animationDelay: "1s" }}></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 rounded-full border-2 border-red-600/20 float-3d" style={{ animationDelay: "2s" }}></div>
-      </div>
+    <main className="min-h-screen bg-white font-sans text-black relative flex flex-col justify-between w-full box-border overflow-x-hidden">
+      
+      {/* Unified Neo-Brutalist Grid Background Pattern */}
+      <div 
+        className="absolute inset-0 opacity-5 pointer-events-none" 
+        style={{
+          backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+          backgroundRepeat: 'repeat'
+        }}
+      />
 
-      <div className="card-3d gold-border rounded-2xl p-12 text-center relative z-10 bg-gradient-to-br from-gray-950 via-black to-gray-950 slide-in max-w-xl mx-4">
-        {/* Decorative corners */}
-        <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-yellow-500"></div>
-        <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-yellow-500"></div>
-        <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-yellow-500"></div>
-        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-yellow-500"></div>
-
-        <h1 className="text-5xl md:text-6xl font-black text-white text-3d text-shine mb-8">
-          MAPUYAP
-        </h1>
-
-        <div className="mb-12">
-          <div className="relative h-20 flex items-center justify-center mb-8">
-            <div className="flex gap-2 items-center">
-              <div className="w-3 h-3 bg-red-600 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-              <div className="w-3 h-3 bg-red-600 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+      {/* Full-Width Header Matching Home Layout */}
+      <header className="w-full border-b-4 border-black px-6 md:px-12 py-6 bg-transparent relative z-10 flex justify-between items-center h-auto">
+        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2 font-black text-2xl tracking-tight relative">
+            <div className="bg-[#B91C1C] text-white w-9 h-9 border-4 border-black rounded-none flex items-center justify-center font-sans shadow-[2px_2px_0px_0px_#000]">
+              ⚡
             </div>
+            <span className="tracking-tighter">MAPUYAP</span>
           </div>
-          <p className="text-2xl font-bold text-yellow-500 mb-4">
-            {status}
-          </p>
-          <p className="text-white/60 text-base">
-            Looking for your perfect match...
-          </p>
+          <div className="flex items-center gap-4 font-mono text-xs">
+            <span className="bg-black text-white px-2 py-1 font-bold">NODE: ONLINE</span>
+          </div>
         </div>
+      </header>
 
-        <div className="red-border rounded-lg p-8 mb-8 bg-gray-900/30">
-          <p className="text-white/80 text-sm leading-relaxed space-y-3">
-            <span className="block">✨ Connecting with a Mapúa student</span>
-            <span className="block">🏆 Premium anonymous chat</span>
-            <span className="block">🔒 Your privacy is guaranteed</span>
-          </p>
+      {/* Dead-Centered Structural Card Container */}
+      <div className="w-full flex-grow flex items-center justify-center p-6 relative z-10">
+        
+        {/* Network Match Search Module Card */}
+        <div className="w-full max-w-md bg-white border-4 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_#D97706] rounded-none relative block text-center">
+          
+          {/* Header Badge */}
+          <div className="inline-block bg-[#B91C1C] text-white font-black text-2xl uppercase tracking-tighter px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_#000] mb-6">
+            MAPUYAP
+          </div>
+
+          {/* Animated Loading Indicator Block */}
+          <div className="flex justify-center items-center gap-2 my-4">
+            <span className="w-3 h-3 bg-[#B91C1C] border-2 border-black animate-bounce [animation-delay:-0.3s]"></span>
+            <span className="w-3 h-3 bg-[#D97706] border-2 border-black animate-bounce [animation-delay:-0.15s]"></span>
+            <span className="w-3 h-3 bg-black border-2 border-black animate-bounce"></span>
+          </div>
+
+          {/* Status Display Area */}
+          <div className="space-y-2 mb-6">
+            <h2 className="text-2xl font-black uppercase tracking-tight text-black">
+              Searching...
+            </h2>
+            <p className="text-sm font-bold text-black/60">
+              Looking for your perfect match as <span className="text-[#B91C1C] underline">{handle}</span> ({department || "General"})
+            </p>
+          </div>
+
+          {/* Terminal Match Metrics Details Box */}
+          <div className="border-4 border-black p-4 mb-6 bg-stone-50 font-mono text-left text-xs space-y-2 shadow-[3px_3px_0px_0px_#000]">
+            <p className="text-black font-bold m-0 flex items-center gap-1">
+              ✨ <span className="font-black text-[#B91C1C]">Connecting:</span> Mapúa Peer Stream
+            </p>
+            <p className="text-black font-bold m-0 flex items-center gap-1">
+              🏆 <span className="font-black text-[#D97706]">Access:</span> Verified Campus Routing
+            </p>
+            <p className="text-black font-bold m-0 flex items-center gap-1">
+              🔒 <span className="font-black text-black">Privacy:</span> Ephemeral Session Keyed
+            </p>
+          </div>
+
+          {/* Core Navigation Action Cancel Trigger */}
+          <button
+            onClick={handleCancel}
+            className="w-full bg-white text-black font-black border-4 border-black py-3 text-center tracking-wide uppercase text-sm shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#B91C1C] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#000] transition-all block relative"
+          >
+            ← GO BACK
+          </button>
+
         </div>
-
-        <button
-          onClick={() => window.location.href = "/"}
-          className="w-full red-border rounded-lg py-3 px-6 text-white font-bold transition-all duration-300 hover:bg-red-600/20 active:scale-95"
-        >
-          ← GO BACK
-        </button>
       </div>
+
+      {/* Symmetrical footer spacer */}
+      <footer className="w-full h-4 mt-auto" />
     </main>
   );
 }
