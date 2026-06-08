@@ -45,10 +45,9 @@ export default function Home() {
   };
 
   return (
-    /* FIXED: min-h-screen combined with flex-col ensures the container stretches to the view height */
-    <main className="min-h-screen bg-white font-sans text-black relative p-6 md:p-12 selection:bg-[#B91C1C] selection:text-white flex flex-col justify-between w-full box-border overflow-x-hidden">
+    <main className="min-h-screen bg-white font-sans text-black relative flex flex-col justify-between w-full box-border overflow-x-hidden">
       
-      {/* Neo-Brutalist Grid Background Pattern (Pinned to all edges) */}
+      {/* Neo-Brutalist Grid Background Pattern */}
       <div 
         className="absolute inset-0 opacity-5 pointer-events-none" 
         style={{
@@ -58,11 +57,10 @@ export default function Home() {
         }}
       />
 
-      {/* Content wrapper to isolate structure from grid background */}
-      <div className="w-full flex flex-col justify-between flex-grow max-w-7xl mx-auto relative z-10">
-        
-        {/* Header / Navbar section */}
-        <header className="flex justify-between items-center border-b-4 border-black pb-6 mb-12 bg-transparent w-full h-auto">
+      {/* FIXED HEADER: Spans all the way to the screen edges */}
+      <header className="w-full border-b-4 border-black px-6 md:px-12 py-6 bg-transparent relative z-10 flex justify-between items-center h-auto">
+        {/* Inner header alignment block matches main body safety padding limits */}
+        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2 font-black text-2xl tracking-tight relative">
             <div className="bg-[#B91C1C] text-white w-9 h-9 border-4 border-black rounded-none flex items-center justify-center font-sans shadow-[2px_2px_0px_0px_#000]">
               ⚡
@@ -74,12 +72,14 @@ export default function Home() {
             <span className="cursor-pointer hover:text-[#B91C1C] hover:underline">Safety</span>
             <span className="cursor-pointer hover:text-[#B91C1C] hover:underline">FAQ</span>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Main split content layout - centered dynamically on screens */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center pb-12 w-full flex-grow my-auto">
+      {/* FIXED BODY CONTAINER: Perfectly centered within the remaining space */}
+      <div className="w-full flex-grow flex items-center justify-center p-6 md:p-12 relative z-10">
+        <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center my-auto">
           
-          {/* Left Side: Hero Text, Badges, and Stacking Chat Bubbles */}
+          {/* Left Side Column */}
           <div className="space-y-12 relative block w-full pr-0 md:pr-4">
             
             {/* Main Hero Group */}
@@ -102,12 +102,12 @@ export default function Home() {
 
               <h1 className="text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-none text-black block relative w-full">
                 Anonymous Chat with <span className="text-[#B91C1C]">Mapúans</span>
-              </h1>
-              
+          </h1>
+          
               <p className="text-lg md:text-xl font-bold max-w-xl text-black/70 leading-relaxed block relative w-full">
                 Free random chat to meet peers across campus. Connect safely through secure matching. No institutional sign-up or tracking.
-              </p>
-            </div>
+          </p>
+        </div>
 
             {/* Stacking Chat Bubbles Section */}
             <div className="pt-4 relative block w-full max-w-lg space-y-3">
@@ -234,11 +234,8 @@ export default function Home() {
           </div>
 
         </div>
-
-        {/* Empty footer space placeholder to keep the layout balanced */}
-        <footer className="w-full h-4 mt-auto" />
-
       </div>
+
     </main>
   );
 }
