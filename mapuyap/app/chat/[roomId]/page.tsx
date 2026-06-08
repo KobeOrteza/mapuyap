@@ -56,7 +56,7 @@ export default function RoomPage() {
   const [department, setDepartment] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; department: string }>({ 
-    name: "Waiting for someone...", 
+    name: "Waiting for fellow yappers...", 
     department: "Searching active arrays..." 
   });
   
@@ -92,7 +92,7 @@ export default function RoomPage() {
     }
   }, [router]);
 
-  const badWords = ["damn", "hell", "shit", "fuck", "bitch", "asshole"];
+  const badWords = ["damn", "hell", "shit", "fuck", "bitch", "asshole","gago", "bastard", "nigga", "pangit", "bobo"];
   const reactions = ["❤️", "👍", "😂", "😮", "😢", "😡"];
 
   const sanitizeMessage = (text: string) => {
