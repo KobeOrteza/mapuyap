@@ -1,24 +1,102 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  ref,
+  push,
+  remove,
+  get,
+  set,
+} from "firebase/database";
+import { db } from "../lib/firebase";
+import { v4 as uuid } from "uuid";
 
 export default function ChatPage() {
-  const router = useRouter();
-  const [handle, setHandle] = useState("Cardinal");
-  const [department, setDepartment] = useState("");
+  const [status, setStatus] = useState("Searching...");
 
   useEffect(() => {
-    // Grab cached user node details from local storage criteria
-    const savedName = localStorage.getItem("name");
-    const savedDept = localStorage.getItem("department");
-    
-    if (savedName) setHandle(savedName);
-    if (savedDept) setDepartment(savedDept);
+    findMatch();
   }, []);
 
-  const handleCancel = () => {
-    router.push("/");
+  const findMatch = async () => {
+    const name =
+      localStorage.getItem("name") ||
+      "Anonymous";
+
+    const department =
+      localStorage.getItem("department") ||
+      "Unknown";
+
+    const queueRef = ref(db, "queue");
+    const snapshot = await get(queueRef);
+    const queue = snapshot.val();
+
+    if (!queue) {
+      const myRef = push(queueRef);
+      await set(myRef, {
+        name,
+        department,
+      });
+      waitForMatch(myRef.key!);
+      return;
+    }
+
+    const users = Object.entries(queue);
+
+    if (users.length === 0) {
+      const myRef = push(queueRef);
+      await set(myRef, {
+        name,
+        department,
+      });
+      waitForMatch(myRef.key!);
+      return;
+    }
+
+    const [otherId] = users[0];
+    const roomId = uuid();
+
+    await set(
+      ref(db, `rooms/${roomId}`),
+      {
+        createdAt: Date.now(),
+      }
+    );
+
+    await set(
+      ref(db, `matches/${otherId}`),
+      {
+        roomId,
+      }
+    );
+
+    await remove(
+      ref(db, `queue/${otherId}`)
+    );
+
+    window.location.href =
+      `/chat/${roomId}`;
+  };
+
+  const waitForMatch = (myId: string) => {
+    const matchRef =
+      ref(db, `matches/${myId}`);
+
+    const interval = setInterval(
+      async () => {
+        const snap = await get(matchRef);
+
+        if (snap.exists()) {
+          clearInterval(interval);
+          const roomId =
+            snap.val().roomId;
+          await remove(matchRef);
+          window.location.href =
+            `/chat/${roomId}`;
+        }
+      },
+      1000
+    );
   };
 
   return (
@@ -34,7 +112,7 @@ export default function ChatPage() {
         }}
       />
 
-      {/* Full-Width Header Matching Home Layout */}
+      {/* Full-Width Header Spanning the screen edges */}
       <header className="w-full border-b-4 border-black px-6 md:px-12 py-6 bg-transparent relative z-10 flex justify-between items-center h-auto">
         <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2 font-black text-2xl tracking-tight relative">
@@ -44,12 +122,12 @@ export default function ChatPage() {
             <span className="tracking-tighter">MAPUYAP</span>
           </div>
           <div className="flex items-center gap-4 font-mono text-xs">
-            <span className="bg-black text-white px-2 py-1 font-bold">NODE: ONLINE</span>
+            <span className="bg-black text-white px-2 py-1 font-bold">NODE: BUSY</span>
           </div>
         </div>
       </header>
 
-      {/* Dead-Centered Structural Card Container */}
+      {/* Dead-Centered Card Container Workspace */}
       <div className="w-full flex-grow flex items-center justify-center p-6 relative z-10">
         
         {/* Network Match Search Module Card */}
@@ -60,24 +138,24 @@ export default function ChatPage() {
             MAPUYAP
           </div>
 
-          {/* Animated Loading Indicator Block */}
-          <div className="flex justify-center items-center gap-2 my-4">
+          {/* Animated Square Brutalist Loading Block Indicators */}
+          <div className="flex justify-center items-center gap-2 mb-4 h-8">
             <span className="w-3 h-3 bg-[#B91C1C] border-2 border-black animate-bounce [animation-delay:-0.3s]"></span>
             <span className="w-3 h-3 bg-[#D97706] border-2 border-black animate-bounce [animation-delay:-0.15s]"></span>
             <span className="w-3 h-3 bg-black border-2 border-black animate-bounce"></span>
           </div>
 
-          {/* Status Display Area */}
+          {/* Dynamic Status Text Trackers */}
           <div className="space-y-2 mb-6">
-            <h2 className="text-2xl font-black uppercase tracking-tight text-black">
-              Searching...
+            <h2 className="text-3xl font-black uppercase tracking-tight text-black">
+              {status}
             </h2>
             <p className="text-sm font-bold text-black/60">
-              Looking for your perfect match as <span className="text-[#B91C1C] underline">{handle}</span> ({department || "General"})
+              Looking for your perfect match...
             </p>
           </div>
 
-          {/* Terminal Match Metrics Details Box */}
+          {/* Terminal Style Information Metadata Block */}
           <div className="border-4 border-black p-4 mb-6 bg-stone-50 font-mono text-left text-xs space-y-2 shadow-[3px_3px_0px_0px_#000]">
             <p className="text-black font-bold m-0 flex items-center gap-1">
               ✨ <span className="font-black text-[#B91C1C]">Connecting:</span> Mapúa Peer Stream
@@ -90,9 +168,9 @@ export default function ChatPage() {
             </p>
           </div>
 
-          {/* Core Navigation Action Cancel Trigger */}
+          {/* Core Action Navigation Return Hook */}
           <button
-            onClick={handleCancel}
+            onClick={() => window.location.href = "/"}
             className="w-full bg-white text-black font-black border-4 border-black py-3 text-center tracking-wide uppercase text-sm shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#B91C1C] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#000] transition-all block relative"
           >
             ← GO BACK
@@ -101,7 +179,7 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Symmetrical footer spacer */}
+      {/* Balanced layout bottom spacing spacer */}
       <footer className="w-full h-4 mt-auto" />
     </main>
   );
