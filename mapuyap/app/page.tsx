@@ -45,7 +45,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white font-sans text-black relative flex flex-col justify-between w-full box-border overflow-x-hidden">
+    <main className="min-h-screen bg-[#FFD1DC] font-sans text-black relative flex flex-col justify-between w-full box-border overflow-x-hidden">
       
       {/* Neo-Brutalist Grid Background Pattern */}
       <div 
@@ -59,7 +59,6 @@ export default function Home() {
 
       {/* FIXED HEADER: Spans all the way to the screen edges */}
       <header className="w-full border-b-4 border-black px-6 md:px-12 py-6 bg-transparent relative z-10 flex justify-between items-center h-auto">
-        {/* Inner header alignment block matches main body safety padding limits */}
         <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2 font-black text-2xl tracking-tight relative">
             <div className="bg-[#B91C1C] text-white w-9 h-9 border-4 border-black rounded-none flex items-center justify-center font-sans shadow-[2px_2px_0px_0px_#000]">
@@ -102,12 +101,12 @@ export default function Home() {
 
               <h1 className="text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-none text-black block relative w-full">
                 Anonymous Chat with <span className="text-[#B91C1C]">Mapúans</span>
-          </h1>
+              </h1>
           
               <p className="text-lg md:text-xl font-bold max-w-xl text-black/70 leading-relaxed block relative w-full">
                 Free random chat to meet peers across campus. Connect safely through secure matching. No institutional sign-up or tracking.
-          </p>
-        </div>
+              </p>
+            </div>
 
             {/* Stacking Chat Bubbles Section */}
             <div className="pt-4 relative block w-full max-w-lg space-y-3">
@@ -145,7 +144,7 @@ export default function Home() {
           </div>
 
           {/* Right Side Column: Setup Form Card Area */}
-          <div className="w-full bg-white border-4 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_#D97706] rounded-none relative block h-auto">
+          <div className="w-full bg-white border-4 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_#B91C1C] rounded-none relative block h-auto">
             
             <div className="relative block mb-6">
               <h2 className="text-2xl font-black uppercase tracking-tight border-b-4 border-black pb-2 bg-[#B91C1C] text-white inline-block px-4 border-r-4 shadow-[4px_4px_0px_0px_#000] h-auto relative">
@@ -234,6 +233,11 @@ export default function Home() {
           </div>
 
         </div>
+      </div>
+
+      {/* OVERLAY: Bottom Right Positioned Message Block */}
+      <div className="absolute bottom-4 right-4 z-50 bg-white text-black font-black uppercase text-xs tracking-wider border-4 border-black px-4 py-2.5 shadow-[4px_4px_0px_0px_#000] rounded-none select-none">
+        pink daw sabi ni rai
       </div>
 
     </main>
